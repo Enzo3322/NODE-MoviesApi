@@ -24,9 +24,10 @@ export class VideosController {
 
   async getAll(req: Request, res: Response) {
     const service = new VideosService();
+    const { page, limit } = req.query;
 
     const videos = await service
-      .getAll()
+      .getAll({ page, limit })
       .catch((e) => res.send("Something exploded on GetAllVideoController"));
     return res.json(videos);
   }
@@ -60,5 +61,29 @@ export class VideosController {
     }
 
     return res.json(result);
+  }
+
+  async getAllByName(req: Request, res: Response) {
+    const service = new VideosService();
+    const { page, limit, name } = req.query;
+
+    const videos = await service
+      .getAllByName({ page, limit, name })
+      .catch(() =>
+        res.send("Something exploded on GetAllVideosByNameController")
+      );
+    return res.json(videos);
+  }
+
+  async getAllByCategoryName(req: Request, res: Response) {
+    const service = new VideosService();
+    const { page, limit, categoryName } = req.query;
+
+    const videos = await service
+      .getAllByCategoryName({ page, limit, categoryName })
+      .catch(() =>
+        res.send("Something exploded on GetAllVideosByCategoryController")
+      );
+    return res.json(videos);
   }
 }

@@ -1,7 +1,7 @@
-import { getRepository } from "typeorm";
+import { getRepository, Like } from "typeorm";
 import { Category } from "../entities/Category";
 import { Video } from "../entities/Video";
-import { VideoRequest, VideoUpdateReq } from "../types/videos";
+import { VideoUpdateReq } from "../types/videos";
 
 export default class VideosService {
   async create({
@@ -9,7 +9,7 @@ export default class VideosService {
     duration,
     description,
     category_id,
-  }: VideoRequest): Promise<Error | Video> {
+  }: any): Promise<Error | Video> {
     const repo = getRepository(Video);
     const repoCategory = getRepository(Category);
 
@@ -37,11 +37,46 @@ export default class VideosService {
     await repo.delete(id);
   }
 
-  async getAll() {
+  async getAll({ page, limit }) {
     const repo = getRepository(Video);
 
     const videos = await repo.find({
       relations: ["category"],
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return videos;
+  }
+
+  async getAllByName({ name, page, limit }) {
+    const repo = getRepository(Video);
+
+    const videos = await repo.find({
+      where: { name: Like(`%${name}%`) },
+      relations: ["category"],
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return videos;
+  }
+
+  async getAllByCategoryName({ categoryName, page, limit }) {
+    const repo = getRepository(Video);
+    const categoryRepo = getRepository(Category);
+
+    const category = await categoryRepo.findOne({
+      where: { name: categoryName },
+    });
+    if (!category) {
+      return new Error("Category not found");
+    }
+
+    const videos = await repo.find({
+      where: { category: category },
+      take: limit,
+      skip: (page - 1) * limit,
     });
 
     return videos;

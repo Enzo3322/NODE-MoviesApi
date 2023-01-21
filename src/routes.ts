@@ -14,4 +14,7 @@ routes.get("/videos", new VideosController().getAll);
 routes.put("/videos/:id", new VideosController().update);
 routes.delete("/videos/:id", new VideosController().delete);
 
+routes.get("/search/category", new VideosController().getAllByCategoryName);
+routes.get("/search/videos", new VideosController().getAllByName);
+
 export { routes };
